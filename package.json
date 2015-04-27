@@ -1,0 +1,24 @@
+{
+  "name": "405-final-proj",
+  "version": "1.0.0",
+  "description": "405 Node Final Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maggiyang/405-final-proj.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maggiyang/405-final-proj/issues"
+  },
+  "homepage": "https://github.com/maggiyang/405-final-proj",
+  "dependencies": {
+    "express": "^4.12.3",
+    "mysql": "^2.6.2",
+    "sequelize": "^2.1.0"
+  }
+}
