@@ -10,9 +10,11 @@
         <div>
             <label>Title:</label>
             <input type="text" name="title" value="<%= pTitle %>"/>
-            <% if(errTitle == true){ %>
+            <% if(errTitle == 1){ %>
                 <b>Title field can not be empty!</b>
-            <% }%>
+            <% } else if (errTitle == 2) {%>
+                <b>This title is taken, please choose another one!</b>
+            <% } %>
             <br/>
 
         </div>
@@ -56,7 +58,17 @@
             <% } %>
         </div>
         <div>
-            <input type="submit" value="Submit"/>
+            <label>Photo:</label>
+            <input type="file" name="displayImage"/>
+        </div>
+        <div>
+            <!--<input type="submit" value="Submit"/>-->
+            <% if(title == 'Create Project'){ %>
+                <button name="submit" value="create" type="submit">Add Project</button>
+            <% } else { %>
+                <button name="submit" value="<%= pID %>" type="submit">Add Project</button>
+            <% } %>
+
         </div>
     </form>
 </div>

@@ -1,10 +1,9 @@
 var Project = require('../models/Project');
+var User = require('../models/User');
+var fs = require('fs');
 
 module.exports = {
     admin: function(req, res) {
-        console.log(req.query.title);
-        //console.log(req.query.award);
-
         res.redirect('/admin/projects');
     },
 
@@ -19,8 +18,6 @@ module.exports = {
     },
 
     createProject: function(req, res) {
-        console.log('pTitle: %s', req.session.title);
-
         res.render('create-project', {
             title: 'Create Project',
             pTitle: '',
@@ -29,17 +26,21 @@ module.exports = {
             pDate: '',
             pCategory: '',
             pColor: '',
-            errTitle: false,
+            errTitle: 0,
             errDescription: false,
             errClient: false,
             errDate: false,
             errCategory: false,
             errColor: 0
-
         });
     },
 
-    addProject: function(req, res){
+    addProject: function(req, res) {
+
+        saveUploadedImages(req);
+        // Add Project info to database
+        if (req.body.submit == 'create') {
+            console.log("creating");
             Project.create({
                 title: req.body.title,
                 description: req.body.description,
@@ -47,27 +48,83 @@ module.exports = {
                 date: req.body.date,
                 category: req.body.category,
                 bgcolor: req.body.color
-            }).then(function(results){
-                Project.findAll().then(function(results){
+            }).then(function (results) {
+                //console.log('-------------------> createproject results: %s', results);
+                //saveUploadedImages(req);
+                //Project.findAll({
+                //    where: {
+                //        title: req.body.title,
+                //        description: req.body.description,
+                //        client: req.body.client
+                //    },
+                //    limit: 1
+                //}).then(function(results) {
+                //    var result = results[0];
+                //    Photo.create({
+                //        url: __dirname + "/uploads/uploadedFileName",
+                //        project_id: result.id
+                //    }).then(function(results){
+                //        console.log(results);
+                //    });
+                //});
+                Project.findAll().then(function (results) {
                     res.render('projects', {
                         title: 'Edit Projects',
                         projects: results
                     });
                 });
-            }).catch(function(err) {
-                saveSessionData(req);
-                handleErrorMessages(req, err);
+            }).catch(function (err) {
+                console.log(err);
+                //saveProjectSessionData(req);
+                //handleProjectErrorMessages(req, err);
 
-                res.redirect('/admin/update-project');
+                res.redirect('/admin/create-project-fix-errors');
             });
+        } else {
+            console.log("updating");
 
+            Project.findAll({
+                where:  {
+                    id: req.body.submit
+                },
+                limit: 1
+            }).then(function (results) {
+                console.log(results);
+                var result = results[0];
+                if (results && result) { // if the record exists in the db
+                    result.updateAttributes({
+                        title: req.body.title,
+                        description: req.body.description,
+                        client: req.body.client,
+                        date: req.body.date,
+                        category: req.body.category,
+                        bgcolor: req.body.color
+                    }).then(function() {
+                        saveUploadedImages(req);
+                        addUploadedImages(req);
+                        Project.findAll().then(function (results) {
+                            res.render('projects', {
+                                title: 'Edit Projects',
+                                projects: results
+                            });
+                        });
+                    }).catch(function (err) {
+                        req.session.pID = req.body.submit;
+                        saveProjectSessionData(req);
+                        handleProjectErrorMessages(req, err);
 
+                        res.redirect('/admin/update-project-fix-errors');
+                    });
+                } else {
+                    // TODO: Handle project not found in db error
+                }
+            });
+        }
     },
 
-    updateProject: function(req, res) {
-        console.log('pTitle: %s', req.body.title);
+    createProjectFixErrors: function(req, res) {
         res.render('create-project', {
-            title: 'Update Project',
+            title: 'Create Project',
             pTitle: req.session.title,
             pDescription: req.session.description,
             pClient: req.session.client,
@@ -83,31 +140,222 @@ module.exports = {
         });
     },
 
-        users: function(req, res) {
-        res.render('users', {
-            title: 'Edit Users'
+    updateProject: function(req, res) {
+        Project.findAll({
+                where:  {id: { like: '%' + req.body.edit + '%'}},
+                limit: 1
+        }).then(function (results) {
+            var result = results[0];
+            if (result) {
+                res.render('create-project', {
+                    title: 'Update Project',
+                    pID: result.id,
+                    pTitle: result.title,
+                    pDescription: result.description,
+                    pClient: result.client,
+                    pDate: result.date,
+                    pCategory: result.category,
+                    pColor: result.bgcolor,
+                    errTitle: 0,
+                    errDescription: false,
+                    errClient: false,
+                    errDate: false,
+                    errCategory: false,
+                    errColor: 0
+                });
+            } else {
+                // TODO: Handle project not found in db error
+            }
+        });
+    },
+
+    updateProjectFixErrors: function(req, res) {
+        res.render('create-project', {
+            title: 'Update Project',
+            pID: req.session.pID,
+            pTitle: req.session.title,
+            pDescription: req.session.description,
+            pClient: req.session.client,
+            pDate: req.session.date,
+            pCategory: req.session.category,
+            pColor: req.session.color,
+            errTitle: req.session.errTitle,
+            errDescription: req.session.errDescription,
+            errClient: req.session.errClient,
+            errDate: req.session.errDate,
+            errCategory: req.session.errCategory,
+            errColor: req.session.errColor
+        });
+    },
+
+    deleteProject:function(req, res) {
+        Project.destroy({
+            where: {
+                id: req.body.delete
+            }
+        }).then(function (results) {
+            res.redirect('/admin/projects');
+        });
+    },
+
+    users: function(req, res) {
+            User.findAll().then(function(results){
+                res.render('users', {
+                    title: 'Edit Users',
+                    users: results
+                });
+            });
+    },
+
+    createUser: function(req, res) {
+        res.render('create-user', {
+            title: 'Create User',
+            pUsername: '',
+            pPassword: '',
+            pAccess: '',
+            errUsername: 0,
+            errPassword: false,
+            errAccess: false
+        });
+    },
+
+    addUser: function(req, res) {
+
+        if (req.body.submit == 'create') {
+            console.log("creating");
+            User.create({
+                username: req.body.username,
+                password: req.body.password,
+                access: req.body.access
+            }).then(function (results) {
+                User.findAll().then(function (results) {
+                    res.render('users', {
+                        title: 'Edit Users',
+                        users: results
+                    });
+                });
+            }).catch(function (err) {
+                console.log(err);
+                saveUserSessionData(req);
+                handleUserErrorMessages(req, err);
+
+                res.redirect('/admin/create-user-fix-errors');
+            });
+        } else {
+            console.log("updating");
+
+            User.findAll({
+                where:  {
+                    id: req.body.submit
+                },
+                limit: 1
+            }).then(function (results) {
+                console.log(results);
+                var result = results[0];
+                if (results && result) { // if the record exists in the db
+                    result.updateAttributes({
+                        username: req.body.username,
+                        password: req.body.password,
+                        access: req.body.access
+                    }).then(function() {
+                        User.findAll().then(function (results) {
+                            res.render('users', {
+                                title: 'Edit Users',
+                                users: results
+                            });
+                        });
+                    }).catch(function (err) {
+                        req.session.pID = req.body.submit;
+                        saveUserSessionData(req);
+                        handleUserErrorMessages(req, err);
+
+                        res.redirect('/admin/update-user-fix-errors');
+                    });
+                } else {
+                    // TODO: Handle project not found in db error
+                }
+
+            });
+
+        }
+    },
+
+    createUserFixErrors: function(req, res) {
+        console.log('createUserFixErrors');
+        res.render('create-user', {
+            title: 'Create User',
+            pUsername: req.session.username,
+            pPassword: req.session.password,
+            pAccess: req.session.access,
+            errUsername: req.session.errUsername,
+            errPassword: req.session.errPassword,
+            errAccess: req.session.errAccess
+        });
+    },
+
+    updateUser: function(req, res) {
+        User.findAll({
+            where:  {id: { like: '%' + req.body.edit + '%'}},
+            limit: 1
+        }).then(function (results) {
+            var result = results[0];
+            if (result) {
+                res.render('create-user', {
+                    title: 'Update User',
+                    pID: result.id,
+                    pUsername: result.username,
+                    pPassword: result.password,
+                    pAccess: result.access,
+                    errUsername: 0,
+                    errPassword: false,
+                    errAccess: false
+                });
+            } else {
+                // TODO: Handle user not found in db error
+            }
+        });
+    },
+
+    updateUserFixErrors: function(req, res) {
+        res.render('create-user', {
+            title: 'Update User',
+            pID: req.session.pID,
+            pUsername: req.session.username,
+            pPassword: req.session.password,
+            pAccess: req.session.access,
+            errUsername: req.session.errUsername,
+            errPassword: req.session.errPassword,
+            errAccess: req.session.errAccess
+        });
+    },
+
+    deleteUser:function(req, res) {
+        User.destroy({
+            where: {
+                id: req.body.delete
+            }
+        }).then(function (results) {
+            res.redirect('/admin/users');
         });
     }
 };
 
 /**
  * This Function saves the create-project form variables to the session so we can access them again when repopulating.
- * The function also sets all the error messages to false/0
+ * The function also sets all the error messages to false
  * @param req
  */
-function saveSessionData(req)
+function saveProjectSessionData(req)
 {
     // Save form data to session
     req.session.title = req.body.title;
-    console.log('body title: %s', req.body.title);
-    console.log('session title: %s', req.session.title);
     req.session.description = req.body.description;
     req.session.client = req.body.client;
     req.session.date = req.body.date;
     req.session.category = req.body.category;
     req.session.color = req.body.color;
     // Hide all error messages
-    req.session.errTitle = false;
+    req.session.errTitle = 0;
     req.session.errDescription = false;
     req.session.errClient = false;
     req.session.errDate = false;
@@ -116,16 +364,20 @@ function saveSessionData(req)
 }
 
 /**
- * This function loops through all the error messages and sets form "errors" to "show" in the form when repopulating
+ * This function loops through all the Create Project error messages and sets form error messages to show in the form
+ * when repopulating
  * @param req
  * @param err
  */
-function handleErrorMessages(req, err)
+function handleProjectErrorMessages(req, err)
 {
     for (var i = 0; i < err.errors.length; i++) {
         switch(err.errors[i].message) {
             case 'emptyTitle':
-                req.session.errTitle = true;
+                req.session.errTitle = 1;
+                break;
+            case 'title must be unique':
+                req.session.errTitle = 2;
                 break;
             case 'emptyDescription':
                 req.session.errDescription = true;
@@ -153,6 +405,66 @@ function handleErrorMessages(req, err)
                 break;
         }
     }
+}
+
+/**
+ * This Function saves the create-user form variables to the session so we can access them again when repopulating.
+ * The function also sets all the error messages to false
+ * @param req
+ */
+function saveUserSessionData(req)
+{
+    // Save form data to session
+    req.session.username = req.body.username;
+    req.session.password = req.body.password;
+    req.session.access = req.body.access;
+    // Hide all error messages
+    req.session.errUsername = 0;
+    req.session.errPassword = false;
+    req.session.errAccess = false;
+}
+
+/**
+ * This function loops through all the Create User error messages and sets form error messages to show in the form when
+ * repopulating
+ * @param req
+ * @param err
+ */
+function handleUserErrorMessages(req, err)
+{
+    for (var i = 0; i < err.errors.length; i++) {
+        switch(err.errors[i].message) {
+            case 'emptyUsername':
+                req.session.errUsername = 1;
+                break;
+            case 'username must be unique':
+                req.session.errUsername = 2;
+                break;
+            case 'emptyPassword':
+                req.session.errPassword = true;
+                break;
+            case 'emptyAccess':
+                req.session.errAccess = true;
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+/**
+ * This function saves an uploaded image to the /uploads/ directory
+ * @param req
+ */
+function saveUploadedImages(req)
+{
+    console.log('req files: %s', req.files);
+    fs.rename(req.files.displayImage.path, __dirname + "/uploads/uploadedFileName");
+}
+
+function addUploadedImages(req)
+{
+
 }
 
 

@@ -20,7 +20,10 @@
             <th>id</th>
             <th>title</th>
             <th>description</th>
+            <th>client</th>
+            <th>date</th>
             <th>category</th>
+            <th>background color</th>
             <th>edit</th>
             <th>delete</th>
         </tr>
@@ -29,9 +32,20 @@
                 <td><%= project.id %></td>
                 <td><%= project.title %></td>
                 <td><%= project.description %></td>
+                <td><%= project.client %></td>
+                <td><%= project.date %></td>
                 <td><%= project.category %></td>
-                <td>Edit</td>
-                <td>Delete</td>
+                <td><%= project.bgcolor %></td>
+                <td>
+                    <form action="/admin/update-project" method="post">
+                        <button name="edit" value="<%= project.id %>" type="submit">Edit</button>
+                    </form>
+                </td>
+                <td>
+                    <form action="/admin/delete-project" method="post">
+                        <button name="delete" value="<%= project.id %>" type="submit">Delete</button>
+                    </form>
+                </td>
             </tr>
         <% })  %>
 

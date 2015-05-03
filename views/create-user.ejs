@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <form action="/admin/users" method="post">
+        <div>
+            <label>Username:</label>
+            <input type="text" name="username" value="<%= pUsername %>"/>
+            <% if(errUsername == 1){ %>
+                <b>Username field can not be empty!</b>
+            <% } else if (errUsername == 2) {%>
+                <b>This username is taken, please choose another one!</b>
+            <% } %>
+            <br/>
+        </div>
+        <div>
+            <label>Password:</label>
+            <input type="text" name="password" value="<%= pPassword %>"/>
+            <% if(errPassword == true){ %>
+                <b>Password field can not be empty!</b>
+            <% }%>
+        </div>
+        <div>
+            <label>Access:</label>
+            <input type="text" name="access" value="<%= pAccess %>"/>
+            <% if(errAccess == true){ %>
+            <b>Access field can not be empty!</b>
+            <% }%>
+        </div>
+
+        <div>
+            <!--<input type="submit" value="Submit"/>-->
+            <% if(title == 'Create User'){ %>
+                <button name="submit" value="create" type="submit">Add User</button>
+            <% } else { %>
+                <button name="submit" value="<%= pID %>" type="submit">Add User</button>
+            <% } %>
+
+        </div>
+    </form>
+</div>
+</body>
+</html>

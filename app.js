@@ -85,10 +85,21 @@ app.get('/admin', AdminController.admin);
 app.get('/admin/projects', AdminController.projects);
 app.get('/admin/create-project', AdminController.createProject);
 app.get('/admin/users', AdminController.users);
-app.get('/admin/update-project', AdminController.updateProject);
+app.get('/admin/create-project-fix-errors', AdminController.createProjectFixErrors);
+app.get('/admin/update-project-fix-errors', AdminController.updateProjectFixErrors);
+app.get('/admin/create-user', AdminController.createUser);
+app.get('/admin/create-user-fix-errors', AdminController.createUserFixErrors);
+app.get('/admin/update-user-fix-errors', AdminController.updateUserFixErrors);
+
 
 app.post('/admin/projects', AdminController.addProject);
-//app.get('/dvds', DvdController.dvds);
+app.post('/admin/update-project', AdminController.updateProject);
+app.post('/admin/delete-project', AdminController.deleteProject);
+app.post('/admin/users', AdminController.addUser);
+app.post('/admin/update-user', AdminController.updateUser);
+app.post('/admin/delete-user', AdminController.deleteUser);
+
+
 
 app.listen(3000, function() {
     console.log('Listening on localhost:3000');

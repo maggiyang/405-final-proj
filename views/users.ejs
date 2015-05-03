@@ -14,9 +14,36 @@
             <a href="/admin/users">Users</a>
         </div>
     </div>
-    <div class="row">
+    <a href="/admin/create-user">Create New User</a>
+    <table class="table">
+        <tr>
+            <th>id</th>
+            <th>username</th>
+            <th>password</th>
+            <th>access</th>
+            <th>edit</th>
+            <th>delete</th>
+        </tr>
+        <% users.forEach(function(user){ %>
+        <tr>
+            <td><%= user.id %></td>
+            <td><%= user.username %></td>
+            <td><%= user.password %></td>
+            <td><%= user.access %></td>
+            <td>
+                <form action="/admin/update-user" method="post">
+                    <button name="edit" value="<%= user.id %>" type="submit">Edit</button>
+                </form>
+            </td>
+            <td>
+                <form action="/admin/delete-user" method="post">
+                    <button name="delete" value="<%= user.id %>" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        <% })  %>
 
-    </div>
+    </table>
 </div>
 </body>
 </html>
