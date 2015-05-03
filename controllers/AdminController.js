@@ -37,7 +37,7 @@ module.exports = {
 
     addProject: function(req, res) {
 
-        saveUploadedImages(req);
+        //saveUploadedImages(req);
         // Add Project info to database
         if (req.body.submit == 'create') {
             console.log("creating");

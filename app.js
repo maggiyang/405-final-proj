@@ -7,6 +7,7 @@ var AdminController = require('./controllers/AdminController');
 var flash = require('connect-flash');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+//var path = require('path');
 
 var User = require('./models/User');
 
@@ -14,6 +15,8 @@ var app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+//app.use(bodyParser({keepExtensions:true,uploadDir:path.join(__dirname,'/files')}));
+
 app.use(flash());
 app.use(cookieParser());
 app.use(session({ secret: 'super-secret', resave: false, saveUninitialized: true }));
