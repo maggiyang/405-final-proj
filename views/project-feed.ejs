@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <ul>
+            <% projects.forEach(function(project){ %>
+            <li>
+                <div><%= project.id %></div>
+                <div><%= project.title %></div>
+                <div><%= project.description %></div>
+                <div><%= project.client %></div>
+                <div><%= project.date %></div>
+                <div><%= project.category %></div>
+                <div><%= project.bgcolor %></div>
+            </li>
+            <% }); %>
+        </ul>
+    </div>
+</body>
+</html>

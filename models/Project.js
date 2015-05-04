@@ -1,5 +1,6 @@
 var Sequelize = require('sequelize');
-var sequelize = require('./../config/sequelize');
+var sequelize = require('../config/sequelize');
+var User = require('./User');
 
 var Project = sequelize.define('project', {
     id: {
@@ -56,5 +57,7 @@ var Project = sequelize.define('project', {
 }, {
     timestamps: false
 });
+
+//Project.hasMany(User, {as: 'Users'});
 
 module.exports = Project;

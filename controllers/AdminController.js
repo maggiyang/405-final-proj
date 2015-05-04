@@ -1,6 +1,7 @@
 var Project = require('../models/Project');
 var User = require('../models/User');
-var fs = require('fs');
+var Photo = require('../models/Photo');
+//var fs = require('fs');
 
 module.exports = {
     admin: function(req, res) {
@@ -37,88 +38,13 @@ module.exports = {
 
     addProject: function(req, res) {
 
-        //saveUploadedImages(req);
         // Add Project info to database
-        if (req.body.submit == 'create') {
+        if (req.body.submissionType === 'create') {
             console.log("creating");
-            Project.create({
-                title: req.body.title,
-                description: req.body.description,
-                client: req.body.client,
-                date: req.body.date,
-                category: req.body.category,
-                bgcolor: req.body.color
-            }).then(function (results) {
-                //console.log('-------------------> createproject results: %s', results);
-                //saveUploadedImages(req);
-                //Project.findAll({
-                //    where: {
-                //        title: req.body.title,
-                //        description: req.body.description,
-                //        client: req.body.client
-                //    },
-                //    limit: 1
-                //}).then(function(results) {
-                //    var result = results[0];
-                //    Photo.create({
-                //        url: __dirname + "/uploads/uploadedFileName",
-                //        project_id: result.id
-                //    }).then(function(results){
-                //        console.log(results);
-                //    });
-                //});
-                Project.findAll().then(function (results) {
-                    res.render('projects', {
-                        title: 'Edit Projects',
-                        projects: results
-                    });
-                });
-            }).catch(function (err) {
-                console.log(err);
-                //saveProjectSessionData(req);
-                //handleProjectErrorMessages(req, err);
-
-                res.redirect('/admin/create-project-fix-errors');
-            });
+            createProject(req, res);
         } else {
             console.log("updating");
-
-            Project.findAll({
-                where:  {
-                    id: req.body.submit
-                },
-                limit: 1
-            }).then(function (results) {
-                console.log(results);
-                var result = results[0];
-                if (results && result) { // if the record exists in the db
-                    result.updateAttributes({
-                        title: req.body.title,
-                        description: req.body.description,
-                        client: req.body.client,
-                        date: req.body.date,
-                        category: req.body.category,
-                        bgcolor: req.body.color
-                    }).then(function() {
-                        saveUploadedImages(req);
-                        addUploadedImages(req);
-                        Project.findAll().then(function (results) {
-                            res.render('projects', {
-                                title: 'Edit Projects',
-                                projects: results
-                            });
-                        });
-                    }).catch(function (err) {
-                        req.session.pID = req.body.submit;
-                        saveProjectSessionData(req);
-                        handleProjectErrorMessages(req, err);
-
-                        res.redirect('/admin/update-project-fix-errors');
-                    });
-                } else {
-                    // TODO: Handle project not found in db error
-                }
-            });
+            updateProject(req, res);
         }
     },
 
@@ -141,27 +67,37 @@ module.exports = {
     },
 
     updateProject: function(req, res) {
+        console.log('----------------> pID in updateProject: %s', req.body.edit);
+        var pID = req.body.edit;
+        //if it is undefined it means we come from upload picture
+        if (typeof pID === 'undefined' || !pID) pID = req.session.pID;
         Project.findAll({
-                where:  {id: { like: '%' + req.body.edit + '%'}},
+                where:  {id: { like: '%' + pID + '%'}},
                 limit: 1
         }).then(function (results) {
             var result = results[0];
             if (result) {
-                res.render('create-project', {
-                    title: 'Update Project',
-                    pID: result.id,
-                    pTitle: result.title,
-                    pDescription: result.description,
-                    pClient: result.client,
-                    pDate: result.date,
-                    pCategory: result.category,
-                    pColor: result.bgcolor,
-                    errTitle: 0,
-                    errDescription: false,
-                    errClient: false,
-                    errDate: false,
-                    errCategory: false,
-                    errColor: 0
+                Photo.findAll({
+                    where: {project_id: { like: '%' + pID + '%'}}
+                }).then(function(photos) {
+                    console.log('--------Photos: %s', photos);
+                    res.render('create-project', {
+                        title: 'Update Project',
+                        pID: result.id,
+                        pTitle: result.title,
+                        pDescription: result.description,
+                        pClient: result.client,
+                        pDate: result.date,
+                        pCategory: result.category,
+                        pColor: result.bgcolor,
+                        errTitle: 0,
+                        errDescription: false,
+                        errClient: false,
+                        errDate: false,
+                        errCategory: false,
+                        errColor: 0,
+                        photos: photos
+                    });
                 });
             } else {
                 // TODO: Handle project not found in db error
@@ -170,21 +106,27 @@ module.exports = {
     },
 
     updateProjectFixErrors: function(req, res) {
-        res.render('create-project', {
-            title: 'Update Project',
-            pID: req.session.pID,
-            pTitle: req.session.title,
-            pDescription: req.session.description,
-            pClient: req.session.client,
-            pDate: req.session.date,
-            pCategory: req.session.category,
-            pColor: req.session.color,
-            errTitle: req.session.errTitle,
-            errDescription: req.session.errDescription,
-            errClient: req.session.errClient,
-            errDate: req.session.errDate,
-            errCategory: req.session.errCategory,
-            errColor: req.session.errColor
+        Photo.findAll({
+            where: {project_id: { like: '%' + req.session.pID + '%'}}
+        }).then(function(photos) {
+            res.render('create-project', {
+                title: 'Update Project',
+                pID: req.session.pID,
+                pTitle: req.session.title,
+                pDescription: req.session.description,
+                pClient: req.session.client,
+                pDate: req.session.date,
+                pCategory: req.session.category,
+                pColor: req.session.color,
+                errTitle: req.session.errTitle,
+                errDescription: req.session.errDescription,
+                errClient: req.session.errClient,
+                errDate: req.session.errDate,
+                errCategory: req.session.errCategory,
+                errColor: req.session.errColor,
+                photos: photos
+
+            });
         });
     },
 
@@ -221,7 +163,7 @@ module.exports = {
 
     addUser: function(req, res) {
 
-        if (req.body.submit == 'create') {
+        if (req.body.submit === 'create') {
             console.log("creating");
             User.create({
                 username: req.body.username,
@@ -453,19 +395,114 @@ function handleUserErrorMessages(req, err)
 }
 
 /**
- * This function saves an uploaded image to the /uploads/ directory
+ * This function handles the creation of a new project
  * @param req
+ * @param res
  */
-function saveUploadedImages(req)
+function createProject(req, res)
 {
-    console.log('req files: %s', req.files);
-    fs.rename(req.files.displayImage.path, __dirname + "/uploads/uploadedFileName");
+    Project.create({
+        title: req.body.title,
+        description: req.body.description,
+        client: req.body.client,
+        date: req.body.date,
+        category: req.body.category,
+        bgcolor: req.body.color
+    }).then(function (results) {
+        if (req.body.submit === 'createAndDone') {
+            Project.findAll().then(function (results) {
+                res.render('projects', {
+                    title: 'Edit Projects',
+                    projects: results
+                });
+            });
+        } else {
+            Project.findAll({
+                where: {
+                    title: req.body.title,
+                    description: req.body.description,
+                    client: req.body.client,
+                    date: req.body.date,
+                    category: req.body.category,
+                    bgcolor: req.body.color
+                },
+                limit: 1
+            }).then(function(results) {
+                req.session.pID = results[0].id;
+                res.redirect('/admin/update-project');
+            });
+        }
+    }).catch(function (err) {
+        console.log(err);
+        saveProjectSessionData(req);
+        handleProjectErrorMessages(req, err);
+
+        res.redirect('/admin/create-project-fix-errors');
+    });
 }
 
-function addUploadedImages(req)
+/**
+ * This method updates an existing project in the database
+ * @param req
+ * @param res
+ */
+function updateProject(req, res)
 {
+    Project.findAll({
+        where:  {
+            id: req.body.submissionType
+        },
+        limit: 1
+    }).then(function (results) {
+        console.log(results);
+        var result = results[0];
+        if (results && result) { // if the record exists in the db
+            result.updateAttributes({
+                title: req.body.title,
+                description: req.body.description,
+                client: req.body.client,
+                date: req.body.date,
+                category: req.body.category,
+                bgcolor: req.body.color
+            }).then(function() {
+                if (req.body.submit === 'createAndDone') {
+                    Project.findAll().then(function (results) {
+                        res.render('projects', {
+                            title: 'Edit Projects',
+                            projects: results
+                        });
+                    });
+                } else {
+                    req.session.pID = req.body.submissionType;
+                    res.redirect('/admin/update-project');
+                }
+            }).catch(function (err) {
+                req.session.pID = req.body.submissionType;
+                saveProjectSessionData(req);
+                handleProjectErrorMessages(req, err);
 
+                res.redirect('/admin/update-project-fix-errors');
+            });
+        } else {
+            // TODO: Handle project not found in db error
+        }
+    });
 }
+///**
+// * This function saves an uploaded image to the /uploads/ directory
+// * @param req
+// */
+//function saveUploadedImages(req)
+//{
+//    console.log('req files: %s', req.files);
+//    console.log('file: %s', req.files[0]);
+//    fs.rename(req.files.displayimage.path, __dirname + "/uploads/uploadedFileName");
+//}
+//
+//function addUploadedImages(req)
+//{
+//
+//}
 
 
 

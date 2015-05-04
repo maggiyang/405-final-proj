@@ -8,10 +8,16 @@ var flash = require('connect-flash');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 //var path = require('path');
+var multer = require('multer');
+var done=false;
+var UploadManager = require('./controllers/UploadManager');
 
 var User = require('./models/User');
-
+var ProjectFeedController = require('./controllers/ProjectFeedController');
 var app = express();
+
+var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
+//app.use(connectEnsureLogin);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -29,6 +35,23 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }));
+//app.use(multer({ dest: './tmp/'}));
+
+app.use(multer({ dest: './uploads/',
+    rename: function (fieldname, filename) {
+        return filename+Date.now();
+    },
+    onFileUploadStart: function (file) {
+        console.log(file.originalname + ' is starting ...')
+    },
+    onFileUploadComplete: function (file) {
+        console.log(file.fieldname + ' uploaded to  ' + file.path)
+        done=true;
+    }
+}));
+
+app.use('/uploads', express.static(__dirname + '/uploads'));
+
 //app.use(cookieSession());
 //app.use(app.router);
 
@@ -63,12 +86,24 @@ passport.deserializeUser(function(id, done) {
 });
 
 
+
+///**
+// * This method checks if the user is Authenticated. If not, redirects to login page
+// * @param req
+// * @param res
+// * @param next
+// * @returns {*}
+// */
+//var isAuthenticated = function (req, res, next) {
+//    if (req.isAuthenticated())
+//        return next();
+//    console.log('req.originalUrl: %s', req.originalUrl);
+//    req.session.urlAfterLogin = req.originalUrl;
+//    res.redirect('/login');
+//}
+
 app.set('view engine', 'ejs');
-app.get('/', function(req, res) {
-    res.render('index', {
-        title: 'Home'
-    });
-});
+app.get('/', ProjectFeedController.showFeed);
 
 app.get('/login', function(req, res){
     res.render('login', {
@@ -77,36 +112,47 @@ app.get('/login', function(req, res){
 });
 
 app.post('/login',
-    passport.authenticate('local', {
-        successRedirect: '/admin',
-        failureRedirect: '/login',
-        failureFlash: true
-    })
+        passport.authenticate('local', {
+            successReturnToOrRedirect: '/admin',
+            failureRedirect: '/login',
+            failureFlash: true
+        })
 );
 
-app.get('/admin', AdminController.admin);
-app.get('/admin/projects', AdminController.projects);
-app.get('/admin/create-project', AdminController.createProject);
-app.get('/admin/users', AdminController.users);
-app.get('/admin/create-project-fix-errors', AdminController.createProjectFixErrors);
-app.get('/admin/update-project-fix-errors', AdminController.updateProjectFixErrors);
-app.get('/admin/create-user', AdminController.createUser);
-app.get('/admin/create-user-fix-errors', AdminController.createUserFixErrors);
-app.get('/admin/update-user-fix-errors', AdminController.updateUserFixErrors);
+app.get('/admin', ensureLoggedIn('/login'), AdminController.admin);
+//module.exports = function(app) {
+//    app.get('/hello', ensureLoggedIn('/login'), function (req, res) {
+//        res.send('look at me!');
+//    });
+//}
 
+app.get('/admin/projects', ensureLoggedIn('/login'), AdminController.projects);
+app.get('/admin/create-project', ensureLoggedIn('/login'), AdminController.createProject);
+app.get('/admin/users', ensureLoggedIn('/login'), AdminController.users);
+app.get('/admin/create-project-fix-errors', ensureLoggedIn('/login'), AdminController.createProjectFixErrors);
+app.get('/admin/update-project-fix-errors', ensureLoggedIn('/login'), AdminController.updateProjectFixErrors);
+app.get('/admin/create-user', ensureLoggedIn('/login'), AdminController.createUser);
+app.get('/admin/create-user-fix-errors', ensureLoggedIn('/login'), AdminController.createUserFixErrors);
+app.get('/admin/update-user-fix-errors', ensureLoggedIn('/login'), AdminController.updateUserFixErrors);
+app.get('/admin/update-project', ensureLoggedIn('/login'), AdminController.updateProject);
 
-app.post('/admin/projects', AdminController.addProject);
-app.post('/admin/update-project', AdminController.updateProject);
-app.post('/admin/delete-project', AdminController.deleteProject);
-app.post('/admin/users', AdminController.addUser);
-app.post('/admin/update-user', AdminController.updateUser);
-app.post('/admin/delete-user', AdminController.deleteUser);
+app.post('/admin/projects', ensureLoggedIn('/login'), AdminController.addProject);
+app.post('/admin/update-project', ensureLoggedIn('/login'), AdminController.updateProject);
+app.post('/admin/delete-project', ensureLoggedIn('/login'), AdminController.deleteProject);
+app.post('/admin/users', ensureLoggedIn('/login'), AdminController.addUser);
+app.post('/admin/update-user', ensureLoggedIn('/login'), AdminController.updateUser);
+app.post('/admin/delete-user', ensureLoggedIn('/login'), AdminController.deleteUser);
 
+//app.get('/admin/upload-page', UploadManager.uploadPage);
+app.post("/admin/upload-project-photo", ensureLoggedIn('/login'), UploadManager.uploadProjectPhoto);
+app.post("/admin/delete-project-photo", ensureLoggedIn('/login'), UploadManager.deleteProjectPhoto)
 
-
-app.listen(3000, function() {
+port = 3000;
+app.listen(port, function() {
     console.log('Listening on localhost:3000');
 });
+
+
 
 
 
