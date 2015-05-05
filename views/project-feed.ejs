@@ -6,18 +6,20 @@
 </head>
 <body>
     <div class="container">
+        <%if (temp) {%>
+            The temperature is: <%=temp.currently.temperature%>
+        <% } %>
         <ul>
-            <% projects.forEach(function(project){ %>
-            <li>
-                <div><%= project.id %></div>
-                <div><%= project.title %></div>
-                <div><%= project.description %></div>
-                <div><%= project.client %></div>
-                <div><%= project.date %></div>
-                <div><%= project.category %></div>
-                <div><%= project.bgcolor %></div>
+        <% projects.forEach(function(project){ %>
+            <li >
+                <%= project.title %>
+                <%= project.description %>
+                <%= project.client %>
+                <% project.Photos.forEach(function(photo) { %>
+                    <img src="<%= photo.url%>">
+                <% }) %>
             </li>
-            <% }); %>
+        <% })  %>
         </ul>
     </div>
 </body>

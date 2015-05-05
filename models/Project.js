@@ -1,63 +1,65 @@
-var Sequelize = require('sequelize');
-var sequelize = require('../config/sequelize');
-var User = require('./User');
+module.exports = function(sequelize, DataTypes){
+    var Project = sequelize.define('Project', {
+        title: {
+            field: 'title',
+            type: DataTypes.STRING,
+            validate:{
+                notEmpty: {args:true, msg: 'emptyTitle'}
+            }
+        },
 
-var Project = sequelize.define('project', {
-    id: {
-        field: 'id',
-        type: Sequelize.INTEGER,
-        autoIncrement: true
-    },
-
-    title: {
-        field: 'title',
-        type: Sequelize.STRING,
-        validate:{
-            notEmpty: {args:true, msg: 'emptyTitle'}
+        description: {
+            field: 'description',
+            type: DataTypes.STRING,
+            validate:{
+                notEmpty: {args:true, msg: 'emptyDescription'}
+            }
+        },
+        client: {
+            field: 'client',
+            type: DataTypes.STRING,
+            validate:{
+                notEmpty: {args:true, msg: 'emptyClient'}
+            }
+        },
+        date: {
+            field: 'date',
+            type: DataTypes.STRING,
+            validate:{
+                notEmpty: {args:true, msg: 'emptyDate'}
+            }
+        },
+        category: {
+            field: 'category',
+            type: DataTypes.STRING,
+            validate:{
+                notEmpty: {args:true, msg: 'emptyCategory'}
+            }
+        },
+        bgcolor: {
+            field: 'bgcolor',
+            type: DataTypes.STRING,
+            validate:{
+                notEmpty: {args:true, msg: 'emptyBgcolor'},
+                contains: {args:'#', msg: '#MissingBgcolor'},
+                len: {args:[7,7], msg: 'lengthNot7Bgcolor'}
+            }
         }
-    },
-
-    description: {
-        field: 'description',
-        type: Sequelize.STRING,
-        validate:{
-            notEmpty: {args:true, msg: 'emptyDescription'}
-        }
-    },
-    client: {
-        field: 'client',
-        type: Sequelize.STRING,
-        validate:{
-            notEmpty: {args:true, msg: 'emptyClient'}
-        }
-    },
-    date: {
-        field: 'date',
-        type: Sequelize.STRING,
-        validate:{
-            notEmpty: {args:true, msg: 'emptyDate'}
-        }
-    },
-    category: {
-        field: 'category',
-        type: Sequelize.STRING,
-        validate:{
-            notEmpty: {args:true, msg: 'emptyCategory'}
-        }
-    },
-    bgcolor: {
-        field: 'bgcolor',
-        type: Sequelize.STRING,
-        validate:{
-            notEmpty: {args:true, msg: 'emptyBgcolor'},
-            contains: {args:'#', msg: '#MissingBgcolor'},
-            len: {args:[7,7], msg: 'lengthNot7Bgcolor'}
-        }
+    }, {
+        timestamps: false
     }
-}, {
-    timestamps: false
-});
+    //    ,
+    //    {
+    //    classMethods:{
+    //        associate: function(models){
+    //            Project.hasMany(models.Photo, {foreignKey: 'project_id'});
+    //        }
+    //    }
+    //}
+    );
 
-//Project.hasMany(User, {as: 'Users'});
+    return Project;
 
-module.exports = Project;
+}
+
+

@@ -7,18 +7,21 @@ var AdminController = require('./controllers/AdminController');
 var flash = require('connect-flash');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-//var path = require('path');
+var path = require('path');
 var multer = require('multer');
 var done=false;
-var UploadManager = require('./controllers/UploadManager');
+var UploadController = require('./controllers/UploadController');
+var UserController = require('./controllers/UserController');
+var models = require('./models');
 
-var User = require('./models/User');
+var User = require('./models').User;
 var ProjectFeedController = require('./controllers/ProjectFeedController');
 var app = express();
 
 var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 //app.use(connectEnsureLogin);
 
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 //app.use(bodyParser({keepExtensions:true,uploadDir:path.join(__dirname,'/files')}));
@@ -85,8 +88,6 @@ passport.deserializeUser(function(id, done) {
     });
 });
 
-
-
 ///**
 // * This method checks if the user is Authenticated. If not, redirects to login page
 // * @param req
@@ -125,6 +126,7 @@ app.get('/admin', ensureLoggedIn('/login'), AdminController.admin);
 //        res.send('look at me!');
 //    });
 //}
+app.get('/huge', UserController.user);
 
 app.get('/admin/projects', ensureLoggedIn('/login'), AdminController.projects);
 app.get('/admin/create-project', ensureLoggedIn('/login'), AdminController.createProject);
@@ -144,12 +146,14 @@ app.post('/admin/update-user', ensureLoggedIn('/login'), AdminController.updateU
 app.post('/admin/delete-user', ensureLoggedIn('/login'), AdminController.deleteUser);
 
 //app.get('/admin/upload-page', UploadManager.uploadPage);
-app.post("/admin/upload-project-photo", ensureLoggedIn('/login'), UploadManager.uploadProjectPhoto);
-app.post("/admin/delete-project-photo", ensureLoggedIn('/login'), UploadManager.deleteProjectPhoto)
+app.post("/admin/upload-project-photo", ensureLoggedIn('/login'), UploadController.uploadProjectPhoto);
+app.post("/admin/delete-project-photo", ensureLoggedIn('/login'), UploadController.deleteProjectPhoto)
 
 port = 3000;
-app.listen(port, function() {
-    console.log('Listening on localhost:3000');
+models.sequelize.sync().then(function(){
+    app.listen(port, function() {
+        console.log('Listening on localhost:3000');
+    });
 });
 
 

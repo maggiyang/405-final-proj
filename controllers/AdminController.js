@@ -1,6 +1,6 @@
-var Project = require('../models/Project');
-var User = require('../models/User');
-var Photo = require('../models/Photo');
+var Project = require('../models').Project;
+var User = require('../models').User;
+var Photo = require('../models').Photo;
 //var fs = require('fs');
 
 module.exports = {
@@ -488,21 +488,6 @@ function updateProject(req, res)
         }
     });
 }
-///**
-// * This function saves an uploaded image to the /uploads/ directory
-// * @param req
-// */
-//function saveUploadedImages(req)
-//{
-//    console.log('req files: %s', req.files);
-//    console.log('file: %s', req.files[0]);
-//    fs.rename(req.files.displayimage.path, __dirname + "/uploads/uploadedFileName");
-//}
-//
-//function addUploadedImages(req)
-//{
-//
-//}
 
 
 

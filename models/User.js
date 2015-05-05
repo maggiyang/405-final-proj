@@ -1,38 +1,32 @@
-var Sequelize = require('sequelize');
-var sequelize = require('./../config/sequelize');
+module.exports = function(sequelize, DataTypes){
+    var User = sequelize.define('User', {
+        username: {
+            field: 'username',
+            type: DataTypes.STRING,
+            validate:{
+                notEmpty: {args:true, msg: 'emptyUsername'}
+            }
+        },
 
-var User = sequelize.define('user', {
-    id: {
-        field: 'id',
-        type: Sequelize.INTEGER,
-        autoIncrement: true
-    },
+        password: {
+            field: 'password',
+            type: DataTypes.STRING,
+            validate:{
+                notEmpty: {args:true, msg: 'emptyPassword'}
+            }
+        },
 
-    username: {
-        field: 'username',
-        type: Sequelize.STRING,
-        validate:{
-            notEmpty: {args:true, msg: 'emptyUsername'}
+        access: {
+            field: 'access',
+            type: DataTypes.STRING,
+            validate:{
+                notEmpty: {args:true, msg: 'emptyAccess'}
+            }
         }
-    },
+    }, {
+        timestamps: false
+    });
 
-    password: {
-        field: 'password',
-        type: Sequelize.STRING,
-        validate:{
-            notEmpty: {args:true, msg: 'emptyPassword'}
-        }
-    },
+    return User;
+}
 
-    access: {
-        field: 'access',
-        type: Sequelize.STRING,
-        validate:{
-            notEmpty: {args:true, msg: 'emptyAccess'}
-        }
-    }
-}, {
-    timestamps: false
-});
-
-module.exports = User;

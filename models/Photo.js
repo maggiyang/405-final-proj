@@ -1,30 +1,32 @@
-var Sequelize = require('sequelize');
-var sequelize = require('./../config/sequelize');
+module.exports = function(sequelize, DataTypes) {
+    var Photo = sequelize.define('Photo', {
+        url: {
+            field: 'url',
+            type: DataTypes.STRING,
+            validate:{
+                notEmpty: {args:true, msg: 'emptyURL'}
+            }
+        },
 
-var Photo = sequelize.define('photo', {
-    id: {
-        field: 'id',
-        type: Sequelize.INTEGER,
-        autoIncrement: true
-    },
-
-    url: {
-        field: 'url',
-        type: Sequelize.STRING,
-        validate:{
-            notEmpty: {args:true, msg: 'emptyURL'}
+        project_id: {
+            field: 'project_id',
+            type: DataTypes.STRING,
+            validate:{
+                notEmpty: {args:true, msg: 'emptyProjectID'}
+            }
         }
-    },
-
-    project_id: {
-        field: 'project_id',
-        type: Sequelize.STRING,
-        validate:{
-            notEmpty: {args:true, msg: 'emptyProjectID'}
+    }, {
+        timestamps: false
+    }, {
+        classMethods:{
+            associate: function(models){
+                Photo.belongsTo(models.Project, {foreignKey: 'project_id'});
+            }
         }
-    }
-}, {
-    timestamps: false
-});
+    });
 
-module.exports = Photo;
+    return Photo;
+}
+
+
+
