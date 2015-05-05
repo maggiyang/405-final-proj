@@ -20,15 +20,8 @@ module.exports = {
             console.dir(weather);
 
             models.Project.findAll({
-                    include:[
-                       //'Pictures'
-                       models.Photo
-                       // {model: models.Photo, as: 'Pictures'}
-                    ]
-
-                }
-
-            ).then(function(projects) {
+                    include:[ models.Photo ]
+                }).then(function(projects) {
                     console.dir(projects[0].Photos[0].url);
                     res.render("project-feed", {
                         title: "Project Feed",

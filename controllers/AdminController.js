@@ -73,35 +73,28 @@ module.exports = {
         if (typeof pID === 'undefined' || !pID) pID = req.session.pID;
         Project.findAll({
                 where:  {id: { like: '%' + pID + '%'}},
-                limit: 1
-        }).then(function (results) {
-            var result = results[0];
-            if (result) {
-                Photo.findAll({
-                    where: {project_id: { like: '%' + pID + '%'}}
-                }).then(function(photos) {
-                    console.log('--------Photos: %s', photos);
-                    res.render('create-project', {
-                        title: 'Update Project',
-                        pID: result.id,
-                        pTitle: result.title,
-                        pDescription: result.description,
-                        pClient: result.client,
-                        pDate: result.date,
-                        pCategory: result.category,
-                        pColor: result.bgcolor,
-                        errTitle: 0,
-                        errDescription: false,
-                        errClient: false,
-                        errDate: false,
-                        errCategory: false,
-                        errColor: 0,
-                        photos: photos
-                    });
-                });
-            } else {
-                // TODO: Handle project not found in db error
-            }
+                limit: 1,
+                include:[ Photo ]
+        }).then(function (projects) {
+            var project = projects[0];
+            console.log(project.Photos[0]);
+            res.render('create-project', {
+                title: 'Update Project',
+                pID: project.id,
+                pTitle: project.title,
+                pDescription: project.description,
+                pClient: project.client,
+                pDate: project.date,
+                pCategory: project.category,
+                pColor: project.bgcolor,
+                errTitle: 0,
+                errDescription: false,
+                errClient: false,
+                errDate: false,
+                errCategory: false,
+                errColor: 0,
+                photos: project.Photos
+            });
         });
     },
 
