@@ -14,6 +14,8 @@ var UploadController = require('./controllers/UploadController');
 var UserController = require('./controllers/UserController');
 var models = require('./models');
 
+var expressApiCache = require('express-api-cache');
+
 var User = require('./models').User;
 var ProjectFeedController = require('./controllers/ProjectFeedController');
 var app = express();
@@ -24,8 +26,6 @@ var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-//app.use(bodyParser({keepExtensions:true,uploadDir:path.join(__dirname,'/files')}));
-
 app.use(flash());
 app.use(cookieParser());
 app.use(session({ secret: 'super-secret', resave: false, saveUninitialized: true }));
@@ -38,7 +38,6 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }));
-//app.use(multer({ dest: './tmp/'}));
 
 app.use(multer({ dest: './uploads/',
     rename: function (fieldname, filename) {
@@ -54,9 +53,6 @@ app.use(multer({ dest: './uploads/',
 }));
 
 app.use('/uploads', express.static(__dirname + '/uploads'));
-
-//app.use(cookieSession());
-//app.use(app.router);
 
 passport.use(new LocalStrategy(
     function(username, password, done) {

@@ -18,7 +18,10 @@
   "homepage": "https://github.com/maggiyang/405-final-proj",
   "dependencies": {
     "express": "^4.12.3",
+    "express-api-cache": "^0.2.1",
+    "hiredis": "^0.3.0",
     "mysql": "^2.6.2",
+    "redis": "^0.12.1",
     "sequelize": "^2.1.0"
   }
 }

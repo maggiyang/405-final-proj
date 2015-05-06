@@ -3,24 +3,38 @@
 <head>
     <title><%= title %></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,900' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Arvo:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
 </head>
 <body>
-    <div class="container">
-        <%if (temp) {%>
-            The temperature is: <%=temp.currently.temperature%>
+    <div class="container-fluid menu">
+        <button id="close-menu">X</button>
+        <div class="temp-container">
+            <%if (temp) {%>
+            <div class="temp"><%=temp.currently.temperature%>&deg;F</div>
+            <p>In Los Angeles</p>
+        </div>
         <% } %>
-        <ul>
-        <% projects.forEach(function(project){ %>
-            <li >
-                <%= project.title %>
-                <%= project.description %>
-                <%= project.client %>
-                <% project.Photos.forEach(function(photo) { %>
-                    <img src="<%= photo.url%>">
-                <% }) %>
-            </li>
-        <% })  %>
-        </ul>
     </div>
+    <button id="menu">&#9776;</button>
+    <% projects.forEach(function(project){ %>
+    <div class="container-fluid outer" style="background-color:<%= project.bgcolor%>;">
+        <div class="info">
+            <h1 class="title"><%= project.title %></h1>
+            <p><strong>Client: </strong><%= project.client%></p>
+            <p><strong>Date: </strong><%= project.date%></p>
+            <p><%= project.description %></p>
+        </div>
+        <div class="container inner">
+            <% project.Photos.forEach(function(photo) { %>
+                <img src="<%= photo.url%>">
+            <% }) %>
+        </div>
+    </div>
+    <% }) %>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>

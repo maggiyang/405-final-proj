@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title><%= title %></title>
+    <title>Admin</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,900' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Arvo:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
 </head>
 <body>
+<div class="container-fluid nav-bar">
+    <a class="nav-link" href="/admin/projects">Projects</a>
+    <a class="nav-link" href="/admin/users">Users</a>
+</div>
 <div class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <a href="/admin/projects">Projects</a>
-        </div>
-        <div class="col-md-6">
-            <a href="/admin/users">Users</a>
-        </div>
+    <div class="create-new">
+        <a href="/admin/create-user">Create New User</a>
     </div>
-    <a href="/admin/create-user">Create New User</a>
     <table class="table">
         <tr>
-            <th>id</th>
             <th>username</th>
             <th>password</th>
             <th>access</th>
@@ -26,7 +26,6 @@
         </tr>
         <% users.forEach(function(user){ %>
         <tr>
-            <td><%= user.id %></td>
             <td><%= user.username %></td>
             <td><%= user.password %></td>
             <td><%= user.access %></td>

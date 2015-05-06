@@ -1,16 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title><%= title %></title>
+    <title>Admin</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,900' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Arvo:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
 </head>
 <body>
-<div class="container">
+<div class="container-fluid nav-bar">
+    <a class="nav-link" href="/admin/projects">Projects</a>
+    <a class="nav-link" href="/admin/users">Users</a>
+</div>
+<div class="container create-holder">
     <form action="/admin/projects"
           method="post">
         <div>
+            <h1>Create Project</h1>
             <label>Title:</label>
-            <input type="text" name="title" value="<%= pTitle %>"/>
+            <input type="text" class="form-control" name="title" value="<%= pTitle %>"/>
             <% if(errTitle === 1){ %>
                 <b>Title field can not be empty!</b>
             <% } else if (errTitle === 2) {%>
@@ -21,35 +29,35 @@
         </div>
         <div>
             <label>Description:</label>
-            <input type="text" name="description" value="<%= pDescription %>"/>
+            <input type="text" class="form-control" name="description" value="<%= pDescription %>"/>
             <% if(errDescription === true){ %>
                 <b>Description field can not be empty!</b>
             <% }%>
         </div>
         <div>
             <label>Client:</label>
-            <input type="text" name="client" value="<%= pClient %>"/>
+            <input type="text" class="form-control" name="client" value="<%= pClient %>"/>
             <% if(errClient === true){ %>
                 <b>Client field can not be empty!</b>
             <% }%>
         </div>
         <div>
             <label>Date:</label>
-            <input type="text" name="date" value="<%= pDate %>"/>
+            <input type="text" class="form-control" name="date" value="<%= pDate %>"/>
             <% if(errDate === true){ %>
                 <b>Date field can not be empty!</b>
             <% }%>
         </div>
         <div>
             <label>Category:</label>
-            <input type="text" name="category" value="<%= pCategory %>"/>
+            <input type="text" class="form-control" name="category" value="<%= pCategory %>"/>
             <% if(errCategory === true){ %>
                 <b>Category field can not be empty!</b>
             <% }%>
         </div>
         <div>
             <label>Background Color:</label>
-            <input type="text" name="color" value="<%= pColor %>"/>
+            <input type="text" class="form-control" name="color" value="<%= pColor %>"/>
             <% if(errColor === 1){ %>
                 <b>Color field can not be empty!</b>
             <% } else if (errColor === 2) {%>
@@ -72,18 +80,17 @@
         </div>
     </form>
     <% if(title !== 'Create Project'){ %>
-    <ul>
+
         <% photos.forEach(function(photo){ %>
-            <li>
+            <div class="upload-holder">
                 <img src="<%= photo.url %>">
                 <form action    =  "/admin/delete-project-photo"
                       method    =  "post">
                     <input type="hidden" name="pID" value="<%=pID%>">
                     <button name="photoUrl" value="<%= photo.url %>" type="submit">Delete</button>
                 </form>
-            </li>
+            </div>
         <% }); %>
-    </ul>
 
     <form id        =  "uploadForm"
           enctype   =  "multipart/form-data"
