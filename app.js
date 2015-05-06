@@ -145,7 +145,7 @@ app.post('/admin/delete-user', ensureLoggedIn('/login'), AdminController.deleteU
 app.post("/admin/upload-project-photo", ensureLoggedIn('/login'), UploadController.uploadProjectPhoto);
 app.post("/admin/delete-project-photo", ensureLoggedIn('/login'), UploadController.deleteProjectPhoto)
 
-port = 3000;
+port = process.env.PORT || 3000;
 models.sequelize.sync().then(function(){
     app.listen(port, function() {
         console.log('Listening on localhost:3000');

@@ -22,7 +22,7 @@ module.exports = {
             models.Project.findAll({
                     include:[ models.Photo ]
                 }).then(function(projects) {
-                    console.dir(projects[0].Photos[0].url);
+                    //console.dir(projects[0].Photos[0].url);
                     res.render("project-feed", {
                         title: "Project Feed",
                         projects: projects,
