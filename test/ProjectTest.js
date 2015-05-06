@@ -49,7 +49,8 @@ describe('Create Project', function(req, res){
             date: "May 12",
             category: "Tired",
             bgcolor: "#111111"
-        }).then(function(){
+        }).then(function(result){
+            console.log(result);
             assert(true);
         })
     })
