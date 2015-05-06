@@ -1,12 +1,12 @@
 {
-  "development": {
-    "username": "root",
-    "password": "root",
-    "database": "405_finalproject",
-    "host": "127.0.0.1",
-    "dialect": "mysql",
-    "port": "8889"
-  },
+
+    "development": {
+      "username": "becb1667a7edf8",
+      "password": "34cf0ac3",
+      "database": "heroku_a31554e285d4e20",
+      "host": "us-cdbr-iron-east-02.cleardb.net",
+      "dialect": "mysql"
+    },
   "test": {
     "username": "root",
     "password": null,
