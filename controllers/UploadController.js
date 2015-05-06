@@ -47,7 +47,8 @@ module.exports = {
  */
 function addPhotoToDatabase(req, res)
 {
-    var photoUrl = req.protocol + '://' + req.host + ( port == 80 || port == 443 ? '' : ':'+ port ) + '/' + req.files.myFile.path;
+    //var photoUrl = req.protocol + '://' + req.host + ( port == 80 || port == 443 ? '' : ':'+ port ) + '/' + req.files.myFile.path;
+    var photoUrl = req.protocol + '://' + req.host + '/' + req.files.myFile.path;
     Photo.create({
                 url: photoUrl,
                 project_id: req.body.pID
